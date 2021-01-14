@@ -1,0 +1,7 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+data_raw/timezones.shapefile/*
+data_raw/US/*
+.DS_Store
