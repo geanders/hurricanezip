@@ -73,6 +73,8 @@ tz_sf_2 <- tz_sf %>%
   st_transform(2163) %>%
   st_simplify(dTolerance = 1000)
 
+# Next step: determine the time zone for each ZIP based on centroid
+
 use_data(study_zips_df_2018)
 write_csv(study_zips_df_2018,
           path = "for_james/zip_code_centers_2018.csv")

@@ -13,7 +13,7 @@ library(stormwindmodel)
 library(tidyr)
 library(purrr)
 library(stringr)
-
+library(tidyverse)
 
 ## Interpolate storm tracks to every 15 minutes
 all_tracks <- hurr_tracks %>%
@@ -73,9 +73,19 @@ calc_closest_dist <- function(this_storm = "Florence-2018"){
   return(closest_dist)
 }
 
+## Next step: add local time based on time zone
+
 # Apply to all hurricane tracks
 hurrs <- as.character(unique(hurr_tracks$storm_id))
 hurrs_2018 <- str_subset(hurrs, "2018") # Later, expand to all years
 
 closest_dist <- lapply(hurrs_2018, calc_closest_dist)
 closest_dist <- do.call("rbind", closest_dist)
+
+##########################################################################
+## Save some files for James to use as input
+all_tracks_2018 <- all_tracks %>%
+  filter(year(date) == 2018)
+
+write_csv(all_tracks_2018, "for_james/interpolated_tracks_2018.csv")
+write_csv(closest_dist, "for_james/closest_distance_2018.csv")
