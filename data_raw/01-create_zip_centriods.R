@@ -1,6 +1,7 @@
 library(tigris)
 library(tidyverse)
 library(sf)
+library(usethis)
 
 study_states <- c("Alabama", "Arkansas", "Connecticut", "Delaware",
                   "District of Columbia", "Florida", "Georgia",
@@ -31,6 +32,8 @@ zc_centers <- read_delim("data_raw/US/US.txt", delim = "\t",
 zc_starts <- zc_centers %>%
   pull(zip_start) %>%
   unique()
+
+########################################################################
 
 # Get all ZIP codes that start with these codes as of 2018
 study_zips <- zctas(cb = TRUE, starts_with = zc_starts, year = 2018)
@@ -77,7 +80,57 @@ tz_sf_2 <- tz_sf %>%
 
 use_data(study_zips_df_2018)
 write_csv(study_zips_df_2018,
-          path = "for_james/zip_code_centers_2018.csv")
+          file = "for_james/zip_code_centers_2018.csv")
+
+########################################################################
+
+# Get all ZIP codes that start with these codes as of 2017
+study_zips <- zctas(cb = TRUE, starts_with = zc_starts, year = 2017)
+
+# Change to a projection to calculate centroids then change back to lat-long
+study_zip_centroids <- study_zips %>%
+  st_transform(crs = 2163) %>%
+  st_centroid() %>%
+  st_transform(., "+proj=longlat +ellps=WGS84 +no_defs")
+
+# Convert to a dataframe of lat-long values for each ZIP code
+study_zips_df_2017 <- study_zip_centroids %>%
+  rename(postal_code = ZCTA5CE10) %>%
+  select(postal_code, geometry) %>%
+  as_tibble() %>%
+  mutate(long = unlist(map(.$geometry,1)),
+         lat = unlist(map(.$geometry,2))) %>%
+  select(-geometry)
+
+# Read in timezone shapefiles
+# Time zone shapefiles are from
+tz_sf <- st_read("data_raw/timezones.shapefile/combined-shapefile.shp") %>%
+  filter(tzid %in% c("America/Chicago",
+                     "America/Detroit",
+                     "America/Indiana/Indianapolis",
+                     "America/Indiana/Knox",
+                     "America/Indiana/Marengo",
+                     "America/Indiana/Petersburg",
+                     "America/Indiana/Tell_City",
+                     "America/Indiana/Vevay",
+                     "America/Indiana/Vincennes",
+                     "America/Indiana/Winamac",
+                     "America/Kentucky/Louisville",
+                     "America/Kentucky/Monticello",
+                     "America/New_York"))
+
+# Simplify the resolution of the borders to make object size
+# a bit smaller
+tz_sf_2 <- tz_sf %>%
+  st_transform(2163) %>%
+  st_simplify(dTolerance = 1000)
+
+# Next step: determine the time zone for each ZIP based on centroid
+
+use_data(study_zips_df_2017)
+write_csv(study_zips_df_2017,
+          file = "for_james/zip_code_centers_2017.csv")
+
 
 ##############################################################################
 
@@ -138,3 +191,9 @@ zc_centers %>%
 # right ZIP code prefixes for our states in a simpler dataset, it might
 # make sense to make that transition to use a simpler dataset and get
 # rid of the "US" file in the raw data folder.
+
+## Write ZIP code centroids for James, to use as an example to
+# start working on precipitation code.
+
+load("data/study_zips_df_2017.rda")
+write_csv(hurr_tracks_2018, "for_james/study_zips_df.csv")
