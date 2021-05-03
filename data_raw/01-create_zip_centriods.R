@@ -78,7 +78,7 @@ tz_sf_2 <- tz_sf %>%
 
 # Next step: determine the time zone for each ZIP based on centroid
 
-use_data(study_zips_df_2018)
+use_data(study_zips_df_2018, overwrite = TRUE)
 write_csv(study_zips_df_2018,
           file = "for_james/zip_code_centers_2018.csv")
 
@@ -127,7 +127,7 @@ tz_sf_2 <- tz_sf %>%
 
 # Next step: determine the time zone for each ZIP based on centroid
 
-use_data(study_zips_df_2017)
+use_data(study_zips_df_2017, overwrite = TRUE)
 write_csv(study_zips_df_2017,
           file = "for_james/zip_code_centers_2017.csv")
 
@@ -192,8 +192,3 @@ zc_centers %>%
 # make sense to make that transition to use a simpler dataset and get
 # rid of the "US" file in the raw data folder.
 
-## Write ZIP code centroids for James, to use as an example to
-# start working on precipitation code.
-
-load("data/study_zips_df_2017.rda")
-write_csv(hurr_tracks_2018, "for_james/study_zips_df.csv")
