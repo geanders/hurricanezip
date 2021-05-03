@@ -7,6 +7,7 @@ library(lubridate)
 library(hurricaneexposure)
 
 data(study_zips_df_2018, package = "hurricanezip")
+data(study_zips_df_2017, package = "hurricanezip")
 data(hurr_tracks, package = "hurricanezip")
 
 library(stormwindmodel)
@@ -47,21 +48,22 @@ all_tracks <- hurr_tracks %>%
   rename(tclon = interp_lon,
          tclat = interp_lat)
 
-calc_closest_dist <- function(this_storm = "Florence-2018"){
+calc_closest_dist <- function(this_storm = "Florence-2018",
+                              study_zips = study_zips_df_2018){
   print(this_storm)
   storm_tracks <- subset(all_tracks, storm_id == this_storm)
   this_id <- storm_tracks$usa_atcf_id[1]
 
   # Calculate distance from county center to storm path
   storm_zip_distances <- spDists(
-    as.matrix(study_zips_df_2018[,c("long", "lat")]),
+    as.matrix(study_zips[,c("long", "lat")]),
     as.matrix(storm_tracks[,c("tclon", "tclat")]),
     longlat = TRUE) # Return distance in kilometers
 
   min_locs <- apply(storm_zip_distances, 1, which.min)
   min_dists <- apply(storm_zip_distances, 1, min)
 
-  closest_dist <- mutate(study_zips_df_2018,
+  closest_dist <- mutate(study_zips,
                          closest_date = storm_tracks$date[min_locs],
                          storm_lat = storm_tracks$tclat[min_locs],
                          storm_long = storm_tracks$tclon[min_locs],
@@ -80,11 +82,15 @@ hurrs <- as.character(unique(hurr_tracks$storm_id))
 hurrs_2018 <- str_subset(hurrs, "2018") # Later, expand to all years
 hurrs_2017 <- str_subset(hurrs, "2017") # Later, expand to all years
 
-closest_dist_2018 <- lapply(hurrs_2018, calc_closest_dist)
+closest_dist_2018 <- lapply(hurrs_2018, calc_closest_dist,
+                            study_zips = study_zips_df_2018)
 closest_dist_2018 <- do.call("rbind", closest_dist_2018)
+use_data(closest_dist_2018, overwrite = TRUE)
 
-closest_dist_2017 <- lapply(hurrs_2017, calc_closest_dist)
+closest_dist_2017 <- lapply(hurrs_2017, calc_closest_dist,
+                            study_zips = study_zips_df_2017)
 closest_dist_2017 <- do.call("rbind", closest_dist_2017)
+use_data(closest_dist_2017, overwrite = TRUE)
 
 
 ##########################################################################
