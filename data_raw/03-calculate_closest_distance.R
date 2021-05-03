@@ -78,14 +78,26 @@ calc_closest_dist <- function(this_storm = "Florence-2018"){
 # Apply to all hurricane tracks
 hurrs <- as.character(unique(hurr_tracks$storm_id))
 hurrs_2018 <- str_subset(hurrs, "2018") # Later, expand to all years
+hurrs_2017 <- str_subset(hurrs, "2017") # Later, expand to all years
 
-closest_dist <- lapply(hurrs_2018, calc_closest_dist)
-closest_dist <- do.call("rbind", closest_dist)
+closest_dist_2018 <- lapply(hurrs_2018, calc_closest_dist)
+closest_dist_2018 <- do.call("rbind", closest_dist_2018)
+
+closest_dist_2017 <- lapply(hurrs_2017, calc_closest_dist)
+closest_dist_2017 <- do.call("rbind", closest_dist_2017)
+
 
 ##########################################################################
 ## Save some files for James to use as input
+
 all_tracks_2018 <- all_tracks %>%
   filter(year(date) == 2018)
 
 write_csv(all_tracks_2018, "for_james/interpolated_tracks_2018.csv")
-write_csv(closest_dist, "for_james/closest_distance_2018.csv")
+write_csv(closest_dist_2017, "for_james/closest_distance_2018.csv")
+
+all_tracks_2017 <- all_tracks %>%
+  filter(year(date) == 2017)
+
+write_csv(all_tracks_2017, "for_james/interpolated_tracks_2017.csv")
+write_csv(closest_dist_2017, "for_james/closest_distance_2017.csv")

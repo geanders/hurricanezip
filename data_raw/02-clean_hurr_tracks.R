@@ -67,18 +67,3 @@ hurr_tracks <- bind_cols(clean_names, clean_data) %>%
          latitude = lat)
 
 usethis::use_data(hurr_tracks, overwrite = TRUE)
-
-# Extract tracks for 2018 and 2017 for James, to use as an example to
-# start working on precipitation code.
-
-load("data/hurr_tracks.rda")
-
-hurr_tracks_2018 <- hurr_tracks %>%
-  filter(str_sub(date, 1, 4) == "2018")
-
-write_csv(hurr_tracks_2018, "for_james/hurr_tracks_2018.csv")
-
-hurr_tracks_2018 <- hurr_tracks %>%
-  filter(str_sub(date, 1, 4) == "2017")
-
-write_csv(hurr_tracks_2018, "for_james/hurr_tracks_2017.csv")
