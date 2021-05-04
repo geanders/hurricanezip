@@ -5,6 +5,7 @@ library(sp)
 library(dplyr)
 library(lubridate)
 library(hurricaneexposure)
+library(usethis)
 
 data(study_zips_df_2018, package = "hurricanezip")
 data(study_zips_df_2017, package = "hurricanezip")
@@ -100,7 +101,7 @@ all_tracks_2018 <- all_tracks %>%
   filter(year(date) == 2018)
 
 write_csv(all_tracks_2018, "for_james/interpolated_tracks_2018.csv")
-write_csv(closest_dist_2017, "for_james/closest_distance_2018.csv")
+write_csv(closest_dist_2018, "for_james/closest_distance_2018.csv")
 
 all_tracks_2017 <- all_tracks %>%
   filter(year(date) == 2017)
