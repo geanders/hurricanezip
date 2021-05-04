@@ -80,8 +80,15 @@ calc_closest_dist <- function(this_storm = "Florence-2018",
 
 # Apply to all hurricane tracks
 hurrs <- as.character(unique(hurr_tracks$storm_id))
+hurrs_2019 <- str_subset(hurrs, "2019") # Later, expand to all years
 hurrs_2018 <- str_subset(hurrs, "2018") # Later, expand to all years
 hurrs_2017 <- str_subset(hurrs, "2017") # Later, expand to all years
+hurrs_2016 <- str_subset(hurrs, "2016") # Later, expand to all years
+
+closest_dist_2019 <- lapply(hurrs_2019, calc_closest_dist,
+                            study_zips = study_zips_df_2019)
+closest_dist_2019 <- do.call("rbind", closest_dist_2019)
+use_data(closest_dist_2019, overwrite = TRUE)
 
 closest_dist_2018 <- lapply(hurrs_2018, calc_closest_dist,
                             study_zips = study_zips_df_2018)
@@ -92,6 +99,11 @@ closest_dist_2017 <- lapply(hurrs_2017, calc_closest_dist,
                             study_zips = study_zips_df_2017)
 closest_dist_2017 <- do.call("rbind", closest_dist_2017)
 use_data(closest_dist_2017, overwrite = TRUE)
+
+closest_dist_2016 <- lapply(hurrs_2016, calc_closest_dist,
+                            study_zips = study_zips_df_2016)
+closest_dist_2016 <- do.call("rbind", closest_dist_2016)
+use_data(closest_dist_2016, overwrite = TRUE)
 
 
 ##########################################################################
