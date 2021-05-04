@@ -102,35 +102,58 @@ study_zips_df_2017 <- study_zip_centroids %>%
          lat = unlist(map(.$geometry,2))) %>%
   select(-geometry)
 
-# Read in timezone shapefiles
-# Time zone shapefiles are from
-tz_sf <- st_read("data_raw/timezones.shapefile/combined-shapefile.shp") %>%
-  filter(tzid %in% c("America/Chicago",
-                     "America/Detroit",
-                     "America/Indiana/Indianapolis",
-                     "America/Indiana/Knox",
-                     "America/Indiana/Marengo",
-                     "America/Indiana/Petersburg",
-                     "America/Indiana/Tell_City",
-                     "America/Indiana/Vevay",
-                     "America/Indiana/Vincennes",
-                     "America/Indiana/Winamac",
-                     "America/Kentucky/Louisville",
-                     "America/Kentucky/Monticello",
-                     "America/New_York"))
-
-# Simplify the resolution of the borders to make object size
-# a bit smaller
-tz_sf_2 <- tz_sf %>%
-  st_transform(2163) %>%
-  st_simplify(dTolerance = 1000)
-
-# Next step: determine the time zone for each ZIP based on centroid
-
 use_data(study_zips_df_2017, overwrite = TRUE)
 write_csv(study_zips_df_2017,
           file = "for_james/zip_code_centers_2017.csv")
 
+
+##############################################################################
+
+# Get all ZIP codes that start with these codes as of 2019
+study_zips <- zctas(cb = TRUE, starts_with = zc_starts, year = 2019)
+
+# Change to a projection to calculate centroids then change back to lat-long
+study_zip_centroids <- study_zips %>%
+  st_transform(crs = 2163) %>%
+  st_centroid() %>%
+  st_transform(., "+proj=longlat +ellps=WGS84 +no_defs")
+
+# Convert to a dataframe of lat-long values for each ZIP code
+study_zips_df_2019 <- study_zip_centroids %>%
+  rename(postal_code = ZCTA5CE10) %>%
+  select(postal_code, geometry) %>%
+  as_tibble() %>%
+  mutate(long = unlist(map(.$geometry,1)),
+         lat = unlist(map(.$geometry,2))) %>%
+  select(-geometry)
+
+use_data(study_zips_df_2019, overwrite = TRUE)
+write_csv(study_zips_df_2019,
+          file = "for_james/zip_code_centers_2019.csv")
+
+##############################################################################
+
+# Get all ZIP codes that start with these codes as of 2016
+study_zips <- zctas(cb = TRUE, starts_with = zc_starts, year = 2016)
+
+# Change to a projection to calculate centroids then change back to lat-long
+study_zip_centroids <- study_zips %>%
+  st_transform(crs = 2163) %>%
+  st_centroid() %>%
+  st_transform(., "+proj=longlat +ellps=WGS84 +no_defs")
+
+# Convert to a dataframe of lat-long values for each ZIP code
+study_zips_df_2016 <- study_zip_centroids %>%
+  rename(postal_code = ZCTA5CE10) %>%
+  select(postal_code, geometry) %>%
+  as_tibble() %>%
+  mutate(long = unlist(map(.$geometry,1)),
+         lat = unlist(map(.$geometry,2))) %>%
+  select(-geometry)
+
+use_data(study_zips_df_2016, overwrite = TRUE)
+write_csv(study_zips_df_2016,
+          file = "for_james/zip_code_centers_2016.csv")
 
 ##############################################################################
 
