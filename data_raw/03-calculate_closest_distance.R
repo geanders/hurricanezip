@@ -109,6 +109,12 @@ use_data(closest_dist_2016, overwrite = TRUE)
 ##########################################################################
 ## Save some files for James to use as input
 
+all_tracks_2019 <- all_tracks %>%
+  filter(year(date) == 2019)
+
+write_csv(all_tracks_2019, "for_james/interpolated_tracks_2019.csv")
+write_csv(closest_dist_2019, "for_james/closest_distance_2019.csv")
+
 all_tracks_2018 <- all_tracks %>%
   filter(year(date) == 2018)
 
@@ -120,3 +126,9 @@ all_tracks_2017 <- all_tracks %>%
 
 write_csv(all_tracks_2017, "for_james/interpolated_tracks_2017.csv")
 write_csv(closest_dist_2017, "for_james/closest_distance_2017.csv")
+
+all_tracks_2016 <- all_tracks %>%
+  filter(year(date) == 2016)
+
+write_csv(all_tracks_2016, "for_james/interpolated_tracks_2016.csv")
+write_csv(closest_dist_2016, "for_james/closest_distance_2016.csv")
